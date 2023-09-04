@@ -1,0 +1,25 @@
+{
+    "editor.fontFamily": "Jetbrains Mono SemiBold",
+    "editor.fontSize": 13,
+    "editor.fontLigatures": true,
+    "[javascript]": {
+        "editor.maxTokenizationLineLength": 2500,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
+        "editor.formatOnSaveMode": "file",
+        "editor.formatOnType": false,
+        "editor.tabSize": 2
+    },
+    "[yml]": {
+        "editor.autoIndent": "none",
+        "editor.insertSpaces": true,
+        "editor.detectIndentation": false
+    },
+    "[yaml]": {
+        "editor.autoIndent": "none",
+        "editor.insertSpaces": true,
+        "editor.detectIndentation": false,
+        "editor.tabSize": 2
+    },
+    "typescript.tsdk": "node_modules\\typescript\\lib"
+}
