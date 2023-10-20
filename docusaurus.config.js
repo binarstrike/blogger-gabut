@@ -1,4 +1,4 @@
-// @ts-check
+// // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
 const lightCodeTheme = require("prism-react-renderer/themes/github");
@@ -8,18 +8,28 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 const config = {
   title: "Blogger Gabut",
   tagline: "Cuman Blog kecil yang membagikan tutorial seputar IT",
-  url: "https://web.binarstrike.my.id",
+  url: "https://web.binardev.site",
   baseUrl: "/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.ico",
   organizationName: "binarstrike", // Usually your GitHub org/user name.
-  projectName: "binarstrike.github.io", // Usually your repo name.
+  projectName: "blogger-gabut", // Usually your repo name.
   i18n: {
     defaultLocale: "id",
     locales: ["id"],
   },
-  themes: [require.resolve("@easyops-cn/docusaurus-search-local")],
+  themes: [
+    [
+      require.resolve("@easyops-cn/docusaurus-search-local"),
+      /** @type {import("@easyops-cn/docusaurus-search-local").PluginOptions} */
+      ({
+        hashed: true,
+        explicitSearchResultPath: true,
+        docsRouteBasePath: "tutorial",
+      }),
+    ],
+  ],
   presets: [
     [
       "classic",
@@ -27,6 +37,7 @@ const config = {
       ({
         docs: {
           sidebarPath: require.resolve("./sidebars.js"),
+          routeBasePath: "tutorial",
         },
         blog: {
           showReadingTime: true,
@@ -45,7 +56,7 @@ const config = {
         title: "Blogger Gabut",
         logo: {
           alt: "My Site Logo",
-          src: "/img/ryo-padoru.png",
+          src: "/img/docusaurus.png",
         },
         items: [
           { to: "/blog", label: "Blog", position: "left" },
@@ -56,10 +67,9 @@ const config = {
             label: "Tutorial",
           },
           {
-            href: "https://github.com/binarstrike",
+            href: "https://github.com/binarstrike/blogger-gabut",
             className: "header-github-link",
             "aria-label": "GitHub repository",
-            // label: "GitHub",
             position: "right",
           },
         ],
@@ -76,7 +86,7 @@ const config = {
               },
               {
                 label: "Telegram",
-                to: "https://t.me/binarstrike",
+                to: "https://t.me/Lynx2148b974",
               },
             ],
           },
@@ -103,7 +113,7 @@ const config = {
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} Blogger Gabut, Inc. Built with <a href="https://docusaurus.io" target="_blank" rel="noopener noreferrer" class="footer__link-item">Docusaurus</a>.`,
+        copyright: `Copyright © ${new Date().getFullYear()} Blogger Gabut. Built with <a href="https://docusaurus.io" target="_blank" rel="noopener noreferrer" class="footer__link-item">Docusaurus</a>.`,
       },
       prism: {
         theme: lightCodeTheme,
