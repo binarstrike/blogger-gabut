@@ -1,11 +1,8 @@
 @import url("./base.css");
 
-[data-theme="dark"] {
-
-  .hero__title,
-  .hero__subtitle {
-    color: #f9f9f9;
-  }
+[data-theme="dark"] .hero__title,
+[data-theme="dark"] .hero__subtitle {
+  color: #f9f9f9;
 }
 
 .header-github-link:hover {
