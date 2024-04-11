@@ -9,7 +9,7 @@ const config = {
   title: "Blogger Gabut",
   tagline: "Cuman Blog kecil yang membagikan tutorial seputar IT",
   url: "https://web.binardev.site",
-  baseUrl: "/",
+  baseUrl: "/blogger-gabut/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.ico",
