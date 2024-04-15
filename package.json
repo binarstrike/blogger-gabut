@@ -30,7 +30,7 @@
     "@docusaurus/tsconfig": "^3.2.1",
     "@docusaurus/types": "^3.2.1",
     "@types/node": "^20.12.7",
-    "@types/react": "^18.2.75",
+    "@types/react": "^18.2.78",
     "typescript": "^5.4.5"
   },
   "browserslist": {
