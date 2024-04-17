@@ -5,7 +5,7 @@ import { themes as prismThemes } from "prism-react-renderer";
 
 const config: Config = {
   title: "Blogger Gabut",
-  tagline: "Cuman Blog kecil yang membagikan tutorial seputar IT",
+  tagline: "Cuman Situs Web kecil yang membagikan tutorial seputar IT",
   url: "https://blogger-gabut.site",
   baseUrl: "/",
   onBrokenLinks: "throw",
@@ -23,7 +23,8 @@ const config: Config = {
       {
         hashed: true,
         explicitSearchResultPath: true,
-        docsRouteBasePath: "tutorial",
+        docsRouteBasePath: "/tutorial",
+        docsDir: "./tutorial",
       } satisfies SearchLocalPluginOptions,
     ],
   ],
@@ -33,10 +34,13 @@ const config: Config = {
       {
         docs: {
           sidebarPath: "./sidebars.ts",
-          routeBasePath: "tutorial",
+          routeBasePath: "/tutorial",
+          showLastUpdateTime: true,
+          path: "./tutorial",
         },
         blog: {
           showReadingTime: true,
+          showLastUpdateTime: true,
         },
         theme: {
           customCss: "./src/css/custom.css",
@@ -50,17 +54,12 @@ const config: Config = {
       title: "Blogger Gabut",
       logo: {
         alt: "My Site Logo",
+        // TODO: change default docusaurus icon.
         src: "img/docusaurus.png",
       },
       items: [
         { to: "/blog", label: "Blog", position: "left" },
         { to: "/tutorial", label: "Tutorial", position: "left" },
-        /* {
-          type: "doc",
-          docId: "intro",
-          position: "left",
-          label: "Tutorial",
-        }, */
         {
           href: "https://github.com/binarstrike/blogger-gabut",
           className: "header-github-link",
@@ -113,15 +112,32 @@ const config: Config = {
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
-      additionalLanguages: ["bash"],
+      additionalLanguages: ["bash", "yaml"],
+      magicComments: [
+        {
+          className: "code-block-highlighted-line",
+          line: "highlight-next-line",
+          block: { start: "highlight-start", end: "highlight-end" },
+        },
+        {
+          className: "code-block-error-line",
+          line: "Ini error",
+          block: { start: "ini-error-mulai", end: "ini-error-selesai" },
+        },
+      ],
     },
     docs: {
       sidebar: {
         hideable: true,
-        autoCollapseCategories: true,
+        autoCollapseCategories: false,
       },
+    },
+    announcementBar: {
+      id: "announcement_bar",
+      content: "Masih dalam pengembangan",
+      isCloseable: true,
     },
   } satisfies Preset.ThemeConfig,
 };
 
-module.exports = config;
+export default config;
