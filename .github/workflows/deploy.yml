@@ -11,32 +11,32 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      
+
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
           version: 8
           run_install: false
-      
+
       - name: Install NodeJS
         uses: actions/setup-node@v3
         with:
           node-version: 22
           cache: pnpm
-      
+
       - name: Install dependencies
-        run: >
+        run: |
           pnpm config set auto-install-peers true
-          && pnpm install --frozen-lockfile
-      
+          pnpm install
+
       - name: Build
         run: pnpm build
-      
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v2
         with:
           path: build
-  
+
   deploy:
     name: Deploy app
     runs-on: ubuntu-latest
