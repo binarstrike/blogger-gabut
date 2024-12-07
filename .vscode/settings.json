@@ -1,7 +1,10 @@
 {
-    "editor.fontFamily": "Jetbrains Mono SemiBold",
-    "editor.fontSize": 13,
+    "editor.fontFamily": "ComicShannsMono Nerd Font",
+    "editor.fontWeight": "bold",
+    "editor.fontSize": 14,
     "editor.fontLigatures": true,
+    "editor.formatOnSave": true,
+    "editor.formatOnSaveMode": "file",
     "[javascript]": {
         "editor.maxTokenizationLineLength": 2500,
         "editor.defaultFormatter": "esbenp.prettier-vscode",
