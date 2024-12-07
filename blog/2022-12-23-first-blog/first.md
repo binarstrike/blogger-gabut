@@ -1,9 +1,12 @@
 ---
-slug: first-blog
-title: My First Blog
+slug: /first-blog
+title: My first blog
 authors: binar
-tags: [first, docusaurus]
+description: "Blog pertama ku"
+tags: [first, blog, docusaurus]
 ---
+
+<!-- truncate -->
 
 Hai :wave: perkenalkan namaku `Binar Nugroho` di situs web ini Aku akan membagikan tutorial dan blog seputar tentang IT terutama pada
 materi _Network System Administration_ atau Sistem Administrasi Jaringan.
