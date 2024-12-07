@@ -1,6 +1,6 @@
 {
   "name": "blogger-gabut",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": false,
   "scripts": {
     "docusaurus": "docusaurus",
@@ -15,23 +15,24 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@docusaurus/core": "3.2.1",
-    "@docusaurus/preset-classic": "3.2.1",
-    "@easyops-cn/docusaurus-search-local": "^0.40.1",
-    "@mdx-js/react": "^3.0.1",
-    "clsx": "^2.1.0",
-    "prism-react-renderer": "^2.3.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "@docusaurus/core": "3.6.3",
+    "@docusaurus/faster": "^3.6.3",
+    "@docusaurus/preset-classic": "3.6.3",
+    "@easyops-cn/docusaurus-search-local": "^0.46.1",
+    "@mdx-js/react": "^3.1.0",
+    "clsx": "^2.1.1",
+    "prism-react-renderer": "^2.4.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "3.2.1",
-    "@docusaurus/theme-classic": "^3.2.1",
-    "@docusaurus/tsconfig": "^3.2.1",
-    "@docusaurus/types": "^3.2.1",
-    "@types/node": "^20.12.7",
-    "@types/react": "^18.2.78",
-    "typescript": "^5.4.5"
+    "@docusaurus/module-type-aliases": "3.6.3",
+    "@docusaurus/theme-classic": "^3.6.3",
+    "@docusaurus/tsconfig": "^3.6.3",
+    "@docusaurus/types": "^3.6.3",
+    "@types/node": "^22.10.1",
+    "@types/react": "^18.3.12",
+    "typescript": "^5.7.2"
   },
   "browserslist": {
     "production": [
@@ -47,5 +48,6 @@
   },
   "engines": {
     "node": ">=16.14"
-  }
+  },
+  "packageManager": "pnpm@9.14.3+sha512.c0f53ee99477ed969b82b289ad011a5d16bf1623c957e7f29eabe8d0c00b574c29b8c7f54f6c67ee710c73f285c8154d07ce44b46fe2c0eeb476a90441bac371"
 }

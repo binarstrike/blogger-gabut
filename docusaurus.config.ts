@@ -17,6 +17,17 @@ const config: Config = {
     defaultLocale: "id",
     locales: ["id"],
   },
+  future: {
+    experimental_faster: {
+      swcJsLoader: true,
+      swcJsMinimizer: true,
+      swcHtmlMinimizer: true,
+      lightningCssMinimizer: true,
+      rspackBundler: true,
+      mdxCrossCompilerCache: true
+    },
+  },
+  staticDirectories: ["static","public"],
   themes: [
     [
       require.resolve("@easyops-cn/docusaurus-search-local"),
@@ -45,6 +56,10 @@ const config: Config = {
         theme: {
           customCss: "./src/css/custom.css",
         },
+        sitemap: {
+          changefreq: "weekly",
+          priority: 0.5
+        }
       } satisfies Preset.Options,
     ],
   ],
