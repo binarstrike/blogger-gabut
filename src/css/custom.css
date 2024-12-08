@@ -176,3 +176,8 @@ html[data-red-border] div#__docusaurus {
   padding: 0 var(--ifm-pre-padding);
   border-left: 3px solid #008dda80;
 }
+
+.my-logo {
+  width: 45px;
+  height: 150px;
+}

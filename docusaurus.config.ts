@@ -67,10 +67,11 @@ const config: Config = {
   themeConfig: {
     navbar: {
       title: "Blogger Gabut",
+      // TODO: ganti logo
       logo: {
         alt: "My Site Logo",
-        // TODO: change default docusaurus icon.
-        src: "img/docusaurus.png",
+        src: "img/logo.png",
+        className: "my-logo"
       },
       items: [
         { to: "/blog", label: "Blog", position: "left" },
