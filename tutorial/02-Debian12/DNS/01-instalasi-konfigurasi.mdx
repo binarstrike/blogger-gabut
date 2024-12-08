@@ -46,18 +46,18 @@ Taruh kode berikut di baris terakhir pada berkas yang akan dimodifikasi.
 
 <CodeBlock language="text" title="/etc/bind/named.conf.local" showLineNumbers>
 {`zone "${FQDN}" {
-    file "/etc/bind/db.${FQDN}";
+    file "${BIND_F_ZONE_FILE_PATH}";
     type master;
 };
 
 zone "27.211.in-addr.arpa" {
-    file "/etc/bind/db.27.211";
+    file "${BIND_R_ZONE_FILE_PATH}";
     type master;
 };
 `}
 </CodeBlock>
 
-Setelah itu langkah selanjutnya adalah membuat _Forward zone_ untuk domain <code>{FQDN}</code> dengan menyalin berkas `/etc/bind/db.local` ke <code>{BIND_F_ZONE_FILE_PATH}</code> dan memodifikasi nya seperti baris kode berikut.
+Setelah itu langkah selanjutnya adalah membuat _Forward zone_ untuk domain <code>{FQDN}</code> dengan menyalin berkas `/etc/bind/db.local` ke <code>{BIND_F_ZONE_FILE_PATH}</code>.
 
 <CodeBlock language="bash" title="CLI">
 {`sudo cp /etc/bind/db.local ${BIND_F_ZONE_FILE_PATH}`}
@@ -66,6 +66,9 @@ Setelah itu langkah selanjutnya adalah membuat _Forward zone_ untuk domain <code
 :::info
 Pada file konfigurasi _zone_ `bind9` jika sebuah baris kode dimulai atau terdapat karakter titik koma `;`, maka baris kode tersebut akan dianggap komentar dan diabaikan dari konfigurasi `bind9`.
 :::
+
+Kemudian modifikasi berkas tersebut dengan baris kode berikut.
+
 <CodeBlock language="text" title={BIND_F_ZONE_FILE_PATH} showLineNumbers>
 {`$TTL	604800
 @	IN	SOA	${FQDN}. root.${FQDN}. (
@@ -82,7 +85,7 @@ Pada file konfigurasi _zone_ `bind9` jika sebuah baris kode dimulai atau terdapa
 ns1  IN  A ${SERVER_HOST} 
 www  IN  A ${SERVER_HOST} 
 mail IN  A ${SERVER_HOST} 
-@ IN  NX 10 mail.${FQDN}.
+@ IN  MX 10 mail.${FQDN}.
 `}
 </CodeBlock>
 
