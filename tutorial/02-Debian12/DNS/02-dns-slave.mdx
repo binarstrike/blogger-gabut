@@ -1,0 +1,194 @@
+---
+slug: /dns-slave-debian
+title: Konfigurasi DNS Slave
+description: Tutorial konfigurasi DNS Slave pada Linux Debian
+tags: [domain, slave, dns, record, debian, linux]
+---
+
+import CodeBlock from "@theme/CodeBlock"
+import v, { BIND_F_ZONE_FILE_PATH, BIND_R_ZONE_FILE_PATH, CLIENT_NAME, SERVER_1_NAME } from "./variables"
+
+# Konfigurasi DNS Slave
+
+:::info
+{/* TODO: write about dns slave */}
+:::
+
+## Topologi
+
+Sama seperti topologi dari tutorial sebelumnya, topologi kali ini ditambahkan satu komputer server yaitu <code>{v.SERVER_2_NAME}</code>.
+
+![topologi](./img/dns-slave-topology.svg)
+
+## Konfigurasi
+
+### Instalasi paket aplikasi
+
+Paket aplikasi yang dibutuhkan untuk menjalankan DNS adalah `bind9`. Berikut perintah yang perlu dijalankan pada <code>{v.SERVER_2_NAME}</code> untuk menginstal paket aplikasi tersebut.
+
+<CodeBlock language="bash" title="CLI">
+{`sudo apt install bind9 -y`}
+</CodeBlock>
+
+### Modifikasi berkas zona master
+
+Langkah selanjutnya adalah memodifikasi berkas <code>{v.BIND_NAMED_CONF_PATH}</code> pada server <code>{v.SERVER_1_NAME}</code> dengan menambahkan baris kode berikut.
+
+<CodeBlock language="text" title={v.BIND_NAMED_CONF_PATH} showLineNumbers>
+{`zone "${v.FQDN}" {
+    file "${v.BIND_F_ZONE_FILE_PATH}";
+    type master;
+
+    // diff-code-new-start
+    allow-update { none; };
+    allow-transfer  { ${v.SERVER_2_HOST}; };
+    also-notify { ${v.SERVER_2_HOST}; };
+    // diff-code-new-end
+};
+
+zone "27.211.in-addr.arpa" {
+    file "${v.BIND_R_ZONE_FILE_PATH}";
+    type master;
+
+    // diff-code-new-start
+    allow-update { none; };
+    allow-transfer  { ${v.SERVER_2_HOST}; };
+    also-notify { ${v.SERVER_2_HOST}; };
+    // diff-code-new-end 
+};
+`}
+</CodeBlock>
+
+:::info
+Opsi `allow-transfer` digunakan untuk untuk mengizinkan transfer dari berkas zona pada <code>{v.SERVER_1_NAME}</code> ke slave DNS server.
+Opsi `also-notify` digunakan untuk memberi pemeberitahuan pada server <code>{v.SERVER_2_NAME}</code> jika terdapat perubahan atau pembaruan berkas zona pada server DNS master.
+:::
+
+### Menambahkan record baru
+
+Setelah itu tambahankan _record_ `A` dan `NS` baru untuk server <code>{v.SERVER_2_NAME}</code> dengan memodifikasi berkas <code>{v.BIND_F_ZONE_FILE_PATH}</code> dan <code>{v.BIND_R_ZONE_FILE_PATH}</code> pada server <code>{SERVER_1_NAME}</code>.
+
+<CodeBlock language="text" title={BIND_F_ZONE_FILE_PATH}>
+{`$TTL  604800
+@ IN  SOA ${v.FQDN}. root.${v.FQDN}. (
+            11  ; Serial
+       604800   ; Refresh
+        86400   ; Retry
+      2419200   ; Expire
+       604800 ) ; Negative Cache TTL
+;
+; informasi name server
+@               IN  NS ${v.FQDN}.
+ns1.${v.FQDN}. IN  NS ns1.${v.FQDN}.
+// diff-code-new
+ns2.${v.FQDN}. IN  NS ns2.${v.FQDN}.
+
+; record A dan lainnya
+@     IN  A  ${v.SERVER_1_HOST}
+ns1   IN  A  ${v.SERVER_1_HOST}
+// diff-code-new
+ns2   IN  A  ${v.SERVER_2_HOST}
+www   IN  A  ${v.SERVER_1_HOST}
+web   IN  CNAME www.${v.FQDN}.
+mail  IN  A  ${v.SERVER_1_HOST}
+@     IN  MX 10 mail.${v.FQDN}
+`}
+</CodeBlock>
+
+<CodeBlock language="text" title={BIND_R_ZONE_FILE_PATH}>
+{`$TTL  604800
+@ IN  SOA ${v.FQDN}. root.${v.FQDN}. (
+            10  ; Serial
+       604800   ; Refresh
+        86400   ; Retry
+      2419200   ; Expire
+       604800 ) ; Negative Cache TTL
+
+; informasi name server
+@                   IN  NS  ns1.${v.FQDN}.
+// diff-code-new
+ns2.${v.FQDN}.     IN  NS  ns2.${v.FQDN}.
+
+; record pointer
+10.65 IN  PTR ${v.FQDN}.
+10.65 IN  PTR ns1.${v.FQDN}.
+// diff-code-new
+20.65 IN  PTR ns2.${v.FQDN}.
+10.65 IN  PTR mail.${v.FQDN}.
+10.65 IN  PTR www.${v.FQDN}.
+`}
+</CodeBlock>
+
+Setelah itu jalankan perintah berikut untuk memulai ulang layanan `bind9`.
+<CodeBlock language="bash" title="CLI">
+{`sudo systemctl restart bind9
+# atau
+sudo systemctl restart named`}
+</CodeBlock>
+
+### Menambahakan zona baru
+
+Setelah mengkonfigurasi DNS pada server <code>{v.SERVER_1_NAME}</code>, langkah selanjutnya adalah menambahkan zona baru untuk domain <code>{v.FQDN}</code> dengan tipe `slave` pada server <code>{v.SERVER_2_NAME}</code> dengan memodifikasi berkas <code>{v.BIND_NAMED_CONF_PATH}</code> dan isi dengan baris kode berikut.
+
+<CodeBlock language="js" title={v.BIND_NAMED_CONF_PATH} showLineNumbers>
+{`zone "${v.FQDN}" {
+    file "${v.BIND_F_ZONE_FILE_PATH}";
+    type slave;
+
+    // isi dengan alamat IP DNS server master
+    // diff-code-new
+    masters { ${v.SERVER_1_HOST}; };
+};
+
+zone "27.211.in-addr.arpa" {
+    file "${v.BIND_R_ZONE_FILE_PATH}";
+    type slave;
+
+    // isi dengan alamat IP DNS server master
+    // diff-code-new
+    masters { ${v.SERVER_1_HOST}; };
+};
+`}
+</CodeBlock>
+
+Kemudian mulai ulang _service_ `bind9`.
+
+<CodeBlock language="bash" title="CLI">
+{`sudo systemctl restart bind9
+# atau
+sudo systemctl restart named`}
+</CodeBlock>
+
+### Pengujian
+
+Jalankan perintah berikut pada komputer <code>{CLIENT_NAME}</code>.
+
+:::info
+Jika perintah `dig` tidak ditemukan maka perlu menginstal terlebih dahulu paket aplikasi `dnsutils` dengan menjalankan perintah `sudo apt install dnsutils -y`
+:::
+
+<CodeBlock language="bash" title="CLI">
+{`# contoh perintah
+# dig +noall +answer -tAXFR <nama domain> @<IP DNS server slave>
+
+dig +noall +answer -tAXFR ${v.FQDN} @${v.SERVER_2_HOST}
+
+# contoh hasil keluaran setelah menjalankan perintah
+# highlight-start
+${v.FQDN}.             604800  IN      SOA     ${v.FQDN}. root.${v.FQDN}. 6 604800 86400 2419200 604800
+${v.FQDN}.             604800  IN      NS      ${v.FQDN}.
+${v.FQDN}.             604800  IN      A       ${v.SERVER_1_HOST}
+${v.FQDN}.             604800  IN      MX      10 mail.${v.FQDN}.
+mail.${v.FQDN}.        604800  IN      A       ${v.SERVER_1_HOST}
+ns1.${v.FQDN}.         604800  IN      NS      ns1.${v.FQDN}.
+ns1.${v.FQDN}.         604800  IN      A       ${v.SERVER_1_HOST}
+ns2.${v.FQDN}.         604800  IN      NS      ns2.${v.FQDN}.
+ns2.${v.FQDN}.         604800  IN      A       ${v.SERVER_2_HOST}
+web.${v.FQDN}.         604800  IN      CNAME   www.${v.FQDN}.
+www.${v.FQDN}.         604800  IN      A       ${v.SERVER_1_HOST}
+${v.FQDN}.             604800  IN      SOA     ${v.FQDN}. root.${v.FQDN}. 6 604800 86400 2419200 604800
+# highlight-end
+`}
+</CodeBlock>
+
+Sekian tutorial kali ini. Materi selanjutnya adalah `DNS Forwarding`.
