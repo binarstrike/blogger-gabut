@@ -177,7 +177,15 @@ html[data-red-border] div#__docusaurus {
   border-left: 3px solid #008dda80;
 }
 
-.my-logo {
-  width: 45px;
-  height: 150px;
+.diff-code-new-highlight {
+  background-color: #dafbe1;
+  display: block;
+  margin: 0 calc(-1 * var(--ifm-pre-padding));
+  padding: 0 var(--ifm-pre-padding);
+  border-left: 3px solid #aceebb;
+}
+
+[data-theme="dark"] .diff-code-new-highlight {
+  background-color: #4f8058;
+  border-left: 3px solid #3c5e42;
 }

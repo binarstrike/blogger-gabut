@@ -24,10 +24,10 @@ const config: Config = {
       swcHtmlMinimizer: true,
       lightningCssMinimizer: true,
       rspackBundler: true,
-      mdxCrossCompilerCache: true
+      mdxCrossCompilerCache: true,
     },
   },
-  staticDirectories: ["static","public"],
+  staticDirectories: ["static", "public"],
   themes: [
     [
       require.resolve("@easyops-cn/docusaurus-search-local"),
@@ -58,8 +58,8 @@ const config: Config = {
         },
         sitemap: {
           changefreq: "weekly",
-          priority: 0.5
-        }
+          priority: 0.5,
+        },
       } satisfies Preset.Options,
     ],
   ],
@@ -71,7 +71,7 @@ const config: Config = {
       logo: {
         alt: "My Site Logo",
         src: "img/logo.png",
-        className: "my-logo"
+        className: "my-logo",
       },
       items: [
         { to: "/blog", label: "Blog", position: "left" },
@@ -139,6 +139,11 @@ const config: Config = {
           className: "code-block-error-line",
           line: "Ini error",
           block: { start: "ini-error-mulai", end: "ini-error-selesai" },
+        },
+        {
+          className: "diff-code-new-highlight",
+          line: "diff-code-new",
+          block: { start: "diff-code-new-start", end: "diff-code-new-end" },
         },
       ],
     },
