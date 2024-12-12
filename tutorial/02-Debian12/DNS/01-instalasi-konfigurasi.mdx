@@ -11,7 +11,7 @@ import v from "./variables"
 # Instalasi dan konfigurasi dasar
 
 :::tip
-Jika terminal linux sudah masuk mode **_superuser_** maka tidak perlu menjalankan perintah pada tutorial ini dengan tambahan `sudo` didepan pada setiap perintah.
+Jika terminal linux sudah masuk mode **_superuser_** maka tidak perlu menjalankan perintah pada tutorial ini dengan tambahan `sudo` di depan pada setiap perintah.
 :::
 
 ## Topologi
@@ -58,11 +58,21 @@ Setelah itu langkah selanjutnya adalah membuat berkas _forward lookup_ untuk dom
 {`sudo cp /etc/bind/db.local ${v.BIND_F_ZONE_FILE_PATH}`}
 </CodeBlock>
 
-:::info
+Kemudian modifikasi berkas tersebut dengan baris kode berikut.
+
+:::note
 Pada file konfigurasi _zone_ `bind9` jika sebuah baris kode dimulai atau terdapat karakter titik koma `;`, maka baris kode tersebut akan dianggap komentar dan diabaikan dari konfigurasi `bind9`.
 :::
 
-Kemudian modifikasi berkas tersebut dengan baris kode berikut.
+:::info
+Ada beberapa macam jenis record pada DNS yaitu:
+- `SOA` atau _Start of Authority_ adalah jenis record yang memuat informasi penting tentang zona pada domain seperti nama domain server utama, alamat email administrator domain, kapan waktu terkhir zona domain.
+- `A` digunakan untuk membuat record yang menerjemahkan nama domain ke alamat IP (ipv4).
+- `AAAA` digunakan untuk membuat record yang menerjemahkan nama domain ke alamat IP (ipv6).
+- `NS` digunakan untuk mengidentifikasi _nameserver_ yang bertanggung jawab pada zona DNS. Jenis record ini dapat memberi tahu mana server yang dapat dikontrak untuk mendapatkan record-record yang berkaitan dengan nama domain.
+- `CNAME` record jenis dapat digunakan untuk membuat nama alias untuk nama domain yang lain.
+- `MX` atau _Mail Exchanger_, record jenis ini digunakan untuk mengatur dan menentukan tingkat prioritas rute mana email akan dikirim ke sebuah nama domain tempat dimana Mail server dituju.
+:::
 
 <CodeBlock language="text" title={v.BIND_F_ZONE_FILE_PATH} showLineNumbers>
 {`$TTL  604800
@@ -90,7 +100,7 @@ mail  IN  A  ${v.SERVER_1_HOST}
 
 ### Menambahkan berkas _reverse lookup zone_
 
-Pada contoh konfigurasi di atas ada beberapa tipe _record_ yang ditambahkan yaitu `A` untuk domain dengan _ipv4_, `NS` (**_Name Server_**) dan `MX` (**_Mail Exchanger_**). Langkah selanjutnya adalah membuat _Reverse zone_ untuk domain <code>{v.FQDN}</code> dengan menyalin file `/etc/bind/db.127` ke {v.BIND_R_ZONE_FILE_PATH}.
+Pada contoh konfigurasi di atas ada beberapa tipe _record_ yang ditambahkan yaitu `A` untuk domain dengan _ipv4_, `NS` (**_Name Server_**) dan `MX` (**_Mail Exchanger_**). Langkah selanjutnya adalah membuat _Reverse lookup zone_ untuk domain <code>{v.FQDN}</code> dengan menyalin file `/etc/bind/db.127` ke <code>{v.BIND_R_ZONE_FILE_PATH}</code>.
 
 <CodeBlock language="bash" title="CLI">
 {`sudo cp /etc/bind/db.127 ${v.BIND_R_ZONE_FILE_PATH}`}
@@ -99,6 +109,14 @@ Pada contoh konfigurasi di atas ada beberapa tipe _record_ yang ditambahkan yait
 Kemdian modifikasi berkas tersebut dengan baris kode berikut.
 
 :::info
+Kebalikan dari _Forward lookup_, _Reverse lookup_ adalah berkas yang memuat informasi tentang alamat IP apa saja yang akan diterjemahkan ke nama domain. 
+:::
+
+:::info
+record `PTR` digunakan pada untuk membuat record _pointer_ yang berfungsi untuk menerjemahkan sebuah alamat IP ke nama domain.
+:::
+
+:::note
 Ketika membuat _record PTR_ atau _pointer_ pada _reverse lookup_ gunakan angka pada _octet_ terakhir dari _IP host_ yang tersedia,
 misal: IP `192.168.10.20` dengan CIDR `24` dan _netmask_ `255.255.255.0`, maka `20` adalah angka dari _octet_ terkahir IP _host_.
 Untuk contoh kode konfigurasi pada tutorial ini, komputer <code>{v.SERVER_1_NAME}</code> memiliki alamat IP <code>{v.SERVER_1_HOST}</code>
