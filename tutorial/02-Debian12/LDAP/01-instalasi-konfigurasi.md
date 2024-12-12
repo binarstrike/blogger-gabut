@@ -12,7 +12,7 @@ Menurut [Wikipedia](https://id.wikipedia.org/wiki/Lightweight_Directory_Access_P
 :::
 
 :::tip
-Jika terminal linux sudah masuk mode **_superuser_** maka tidak perlu menjalankan perintah pada tutorial ini dengan tambahan `sudo` didepan pada setiap perintah.
+Jika terminal linux sudah masuk mode **_superuser_** maka tidak perlu menjalankan perintah pada tutorial ini dengan tambahan `sudo` di depan pada setiap perintah.
 :::
 
 ## Instalasi dan Konfigurasi
