@@ -32,6 +32,9 @@
     "@docusaurus/types": "^3.6.3",
     "@types/node": "^22.10.1",
     "@types/react": "^18.3.12",
+    "glob": "^11.0.0",
+    "replace-in-file": "^8.2.0",
+    "svgo": "^3.3.2",
     "typescript": "^5.7.2"
   },
   "browserslist": {
