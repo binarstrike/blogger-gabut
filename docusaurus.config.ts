@@ -27,6 +27,15 @@ const config: Config = {
       mdxCrossCompilerCache: true,
     },
   },
+  plugins: [
+    [
+      "vercel-analytics",
+      {
+        debug: true,
+        mode: "auto",
+      },
+    ],
+  ],
   staticDirectories: ["static", "public"],
   themes: [
     [
