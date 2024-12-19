@@ -2,6 +2,7 @@ import type { Config } from "@docusaurus/types";
 import type * as Preset from "@docusaurus/preset-classic";
 import type { PluginOptions as SearchLocalPluginOptions } from "@easyops-cn/docusaurus-search-local";
 import { themes as prismThemes } from "prism-react-renderer";
+import type { ThemeConfig as MermaidThemeConfig } from "@docusaurus/theme-mermaid";
 
 const config: Config = {
   title: "Blogger Gabut",
@@ -36,8 +37,12 @@ const config: Config = {
       },
     ],
   ],
+  markdown: {
+    mermaid: true,
+  },
   staticDirectories: ["static", "public"],
   themes: [
+    "@docusaurus/theme-mermaid",
     [
       require.resolve("@easyops-cn/docusaurus-search-local"),
       {
@@ -167,6 +172,15 @@ const config: Config = {
       content: "Masih dalam pengembangan",
       isCloseable: true,
     },
+    mermaid: {
+      options: {
+        look: "handDrawn",
+      },
+      theme: {
+        dark: "dark",
+        light: "forest",
+      },
+    } satisfies MermaidThemeConfig["mermaid"],
   } satisfies Preset.ThemeConfig,
 };
 
