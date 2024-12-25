@@ -28,15 +28,6 @@ const config: Config = {
       mdxCrossCompilerCache: true,
     },
   },
-  plugins: [
-    [
-      "vercel-analytics",
-      {
-        debug: true,
-        mode: "auto",
-      },
-    ],
-  ],
   markdown: {
     mermaid: true,
   },
