@@ -1,0 +1,388 @@
+---
+slug: /instalasi-konfigurasi-ca-debian
+title: Instalasi dan konfigurasi dasar
+description: Tutorial instalasi dan konfigurasi Certificate Authority pada Linux Debian
+tags: [certificate, authority, ca, openssl,debian, linux]
+---
+
+{/* TODO: using absolute or relative path for CLI commands? */}
+
+import CodeBlock from "@theme/CodeBlock"
+import v from "./variables"
+
+# Instalasi dan konfigurasi dasar
+
+:::info
+**openssl** adalah sebuah toolkit yang menyediakan implementasi protokol SSL/TLS serta berbagai fungsi kriptografi lainnya. openssl dapat digunakan untuk membuat sertifikat, public dan private key, serta melakukan enkripsi dan dekripsi data.
+:::
+
+## Topologi
+
+Tidak ada topologi khusus pada tutorial ini, yang dibutuhkan hanyalah satu mesin berupa Virtual machine atau komputer fisik dengan operasi sistem Linux Debian 12.
+
+## Instalasi dan konfigurasi
+
+### Instalasi paket aplikasi
+
+Paket aplikasi yang dibutuhkan adalah `openssl`, jalankan perintah berikut untuk menginstalnya.
+
+<CodeBlock language="bash" title="CLI">
+{`sudo apt install openssl -y`}
+</CodeBlock>
+
+## Membuat root CA
+
+:::info
+Root CA adalah sertifikat utama atau paling atas yang menandatangani sertifikat lainnya.
+:::
+
+### Membuat direktori
+
+Langkah pertama yang perlu dilakukan adalah membuat direktori untuk menyimpan berkas konfigurasi dan sertifikat. Misal direktori yang akan digunakan pada tutorial ini adalah <code>{v.CA_DIR}</code>. Jalankan perintah berikut untuk membuat direktori tersebut.
+
+:::note
+diasumsikan bahwa sudah masuk mode superuser atau menggunakan sudo untuk menjalankan perintah-perintah CLI pada tutorial ini.
+:::
+
+<CodeBlock language="bash" title="CLI">
+{`mkdir ${v.CA_DIR}
+
+# mengganti direktori aktif
+cd ${v.CA_DIR}`}
+</CodeBlock>
+
+### Membuat private key
+
+Langkah selanjutnya adalah membuat private key untuk root CA. Jalankan perintah berikut untuk membuat private key.
+
+<CodeBlock language="bash" title="CLI">
+{`# contoh perintah
+# openssl genrsa <jenis algoritma> -out <private key> <ukuran bit>
+# ada beberapa jenis algoritma yang dapat digunakan, diantaranya aes256, aes128, des3, rsa dan lain-lain
+# ukuran bit dapat diatur sesuai kebutuhan, misal 2048, 4096, dan lain-lain dengan menyertakan ukuran bit diakhir perintah
+
+# Ketika menjalankan perintah untuk membuat private key, akan muncul pertanyaan untuk membuat passphrase
+# atau password untuk private key. Masukan passphrase atau password, kemudian tekan tombol Enter
+# dan masukan ulang passphrase atau password yang sama untuk konfirmasi.
+
+# highlight-next-line
+openssl genrsa -aes256 -out ${v.CA_PRIV_KEY} 2048
+
+Enter PEM pass phrase:
+Verifying - Enter PEM pass phrase:
+`}
+</CodeBlock>
+
+:::info
+jika tidak ingin menggunakan passphrase atau password pada private key, dapat menghilangkan flag `-aes256` pada perintah untuk membuat private key.
+:::
+
+:::note
+Saat memasukan passphrase atau password, karakter atau huruf yang diketik tidak akan terlihat pada layar hal ini normal untuk alasan keamanan.
+:::
+
+Perintah untuk membuat private key di atas akan menghasilkan berkas private key dengan nama <code>{v.CA_PRIV_KEY}</code>. 
+
+
+### Membuat sertifikat root CA
+
+Setelah membuat private key, langkah selanjutnya adalah membuat sertifikat root CA. Jalankan perintah berikut untuk membuat sertifikat root CA.
+
+<CodeBlock language="bash" title="CLI">
+{`# contoh perintah
+# openssl req -x509 -new -nodes -key <private key> -sha256 -days <masa berlaku> -out <sertifikat>
+
+# highlight-next-line
+openssl req -x509 -new -nodes -key ${v.CA_PRIV_KEY} -sha256 -days 365 -out ${v.CA_CERT}
+
+# Setelah menjalankan perintah di atas, akan muncul _prompt_ untuk mengisi passphrase atau password
+# dari private key yang telah dibuat sebelumnya yang dilanjutkan dengan mengisi informasi sertifikat.
+
+Enter pass phrase for ca.key:
+`}
+</CodeBlock>
+
+Setelah menjalankan perintah di atas, akan muncul pertanyaan untuk mengisi informasi sertifikat. Isi informasi tersebut sesuai kebutuhan.
+
+Misal informasi sertifikat yang diisi adalah sebagai berikut:
+
+<CodeBlock language="text" title="CLI">
+{`Country Name (2 letter code) [AU]:ID 
+State or Province Name (full name) [Some-State]:Jawa Tengah
+Locality Name (eg, city) []: Cilacap
+Organization Name (eg, company) [Internet Widgits Pty Ltd]: LKS LAB
+Organizational Unit Name (eg, section) []:ITNSA
+Common Name (e.g. server FQDN or YOUR name) []: lkslab.com
+Email Address []: example01@xyz.com
+`}
+</CodeBlock>
+
+Setelah menjalankan perintah untuk membuat sertifikat root CA, akan menghasilkan berkas sertifikat dengan nama <code>{v.CA_CERT}</code>.
+
+:::note
+Alamat email bersifat opsional dan bisa dikosongkan.
+:::
+
+### Menampilkan informasi sertifikat
+
+Untuk menampilkan informasi sertifikat yang telah dibuat, dapat menjalankan perintah berikut.
+
+<CodeBlock language="bash" title="CLI">
+{`# contoh perintah
+# openssl x509 -in <sertifikat> -text -noout
+
+# jalankan perintah berikut untuk menampilkan informasi sertifikat root CA
+# highlight-next-line
+openssl x509 -in ${v.CA_CERT} -text -noout
+
+# contoh keluaran atau hasl yang tampil pada layar terminal dari perintah di atas
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number:
+            25:31:ca:92:3e:de:91:29:49:76:36:95:1e:4e:89:6f:ea:7c:65:b1
+        Signature Algorithm: sha256WithRSAEncryption
+        Issuer: CN = LKS LAB, C = ID, L = Jawa Tengah, O = LKS, OU = LKS
+        Validity
+            Not Before: Dec 20 17:24:53 2024 GMT
+            Not After : Dec 20 17:24:53 2025 GMT
+        Subject: CN = LKS LAB, C = ID, L = Jawa Tengah, O = LKS, OU = LKS
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (2048 bit)
+                Modulus:
+                    00:ef:6f:73:9b:f5:9c:5b:92:69:fe:95:b8:09:06:
+                    fd:b9:86:af:4a:0c:24:54:24:2a:b0:94:77:80:a2: 
+                    ...
+               Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Subject Key Identifier: 
+                A0:94:DC:FB:97:02:DB:B7:14:9F:36:D3:75:07:6B:BF:09:6D:09:4B
+            X509v3 Authority Key Identifier: 
+                A0:94:DC:FB:97:02:DB:B7:14:9F:36:D3:75:07:6B:BF:09:6D:09:4B
+            X509v3 Basic Constraints: critical
+                CA:TRUE
+    Signature Algorithm: sha256WithRSAEncryption
+    Signature Value:
+        3c:f6:49:f8:c2:4a:12:0b:24:8a:65:58:e8:87:e0:eb:6b:4d:
+        54:34:c1:f0:c9:15:e7:08:73:05:23:02:20:93:f8:da:fd:20:
+        ...
+
+`}
+</CodeBlock>
+
+## Membuat sertifikat server
+
+Setelah membuat sertifikat root CA, langkah selanjutnya adalah membuat sertifikat server. Sertifikat server dapat digunakan untuk mengamankan koneksi antara server dan client, contohnya seperti Web server dengan protokol HTTPS dan Mail server dengan protokol SMTPS.
+
+### Membuat direktori
+
+Buat direktori untuk menyimpan berkas konfigurasi dan sertifikat server. Misal direktori yang akan digunakan pada tutorial ini adalah <code>{v.SERVER_CERT_DIR}</code>. Jalankan perintah berikut untuk membuat direktori tersebut.
+
+<CodeBlock language="bash" title="CLI">
+{`mkdir ${v.SERVER_CERT_DIR}
+
+# mengganti direktori aktif
+cd ${v.SERVER_CERT_DIR}`}
+</CodeBlock>
+
+### Membuat private key
+
+Langkah selanjutnya adalah membuat private key untuk server. Jalankan perintah berikut untuk membuat private key.
+
+<CodeBlock language="bash" title="CLI">
+{`openssl genrsa -aes256 -out ${v.SERVER_PRIV_KEY} 2048
+
+# jalankan perintah di atas dan masukan passphrase atau password untuk private key
+`}
+</CodeBlock>
+
+Setelah menjalankan perintah untuk membuat private key untuk sertifikat server, akan menghasilkan berkas private key dengan nama <code>{v.SERVER_PRIV_KEY}</code>.
+
+### Membuat CSR (Certificate Signing Request)
+
+Setelah membuat private key, langkah selanjutnya adalah membuat CSR (Certificate Signing Request) untuk server. CSR digunakan untuk membuat permintaan tanda tangan sertifikat kepada CA yang memuat informasi sertifikat server seperti Common Name (CN), Organization Name (O), dan lain-lain. Jalankan perintah berikut untuk membuat CSR.
+
+<CodeBlock language="bash" title="CLI">
+{`# contoh perintah
+# openssl req -new -key <private key> -out <nama file csr>
+
+# highlight-next-line
+openssl req -new -key ${v.SERVER_PRIV_KEY} -out ${v.SERVER_CSR}
+
+# masukan passphrase atau password dari private key yang telah dibuat sebelumnya
+`}
+</CodeBlock>
+
+Setelah menjalankan perintah di atas, akan muncul pertanyaan untuk mengisi informasi sertifikat dan menghasilkan
+berkas CSR dengan nama <code>{v.SERVER_CSR}</code>. Isi informasi tersebut sesuai kebutuhan.
+
+Misal informasi yang diisi adalah sebagai berikut:
+
+<CodeBlock language="text" title="CLI">
+{`Country Name (2 letter code) [AU]:ID
+State or Province Name (full name) [Some-State]:Jawa Tengah
+Locality Name (eg, city) []: Kebumen
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:LKS LAB
+Organizational Unit Name (eg, section) []:ITNSA
+Common Name (e.g. server FQDN or YOUR name) []: srv1.lkslab.com
+Email Address []: admin01@lkslab.com
+`}
+</CodeBlock>
+
+Untuk alamat email bersifat opsional dan bisa dikosongkan.
+
+### Menandatangani sertifikat server
+
+Setelah membuat CSR, langkah selanjutnya adalah menandatangani sertifikat server menggunakan sertifikat root CA yang telah dibuat sebelumnya. Jalankan perintah berikut untuk menandatangani sertifikat server.
+
+<CodeBlock language="bash" title="CLI">
+{`# contoh perintah
+# openssl x509 -req -days <masa berlaku> -sha256 -CAcreateserial -in <csr> -CA <sertifikat CA> -CAkey <private key CA> -out <sertifikat server>
+
+# highlight-next-line
+openssl x509 -req -days 365 -sha256 -CAcreateserial -in ${v.SERVER_CSR} -CA ${v.CA_CERT} -CAkey ${v.CA_PRIV_KEY} -out ${v.SERVER_CERT}
+
+# ketika menjalankan perintah di atas, akan muncul pertanyaan untuk mengisi passphrase atau password dari private key CA
+`}
+</CodeBlock>
+
+:::info
+- `-req` : flag ini digunakan untuk menandatangani CSR.
+- `-days` : opsi ini digunakan untuk menentukan masa berlaku sertifikat dalam hari.
+- `-sha256` : flag ini digunakan untuk menandatangani sertifikat dengan algoritma hash SHA-256.
+- `-CAcreateserial` : flag ini digunakan untuk membuat berkas serial number.
+- `-in` : opsi ini digunakan untuk menentukan berkas CSR yang akan ditandatangani.
+- `-CA` : opsi ini digunakan untuk menentukan sertifikat root CA.
+- `-CAkey` : opsi ini digunakan untuk menentukan private key root CA.
+- `-out` : opsi ini digunakan untuk menentukan nama berkas sertifikat server yang akan dihasilkan.
+:::
+
+Setelah menjalankan perintah di atas, akan menghasilkan berkas sertifikat server dengan nama <code>{v.SERVER_CERT}</code>.
+
+### Menampilkan informasi sertifikat server
+
+Untuk menampilkan informasi sertifikat server yang telah dibuat, dapat menjalankan perintah berikut.
+
+<CodeBlock language="bash" title="CLI">
+{`# highlight-next-line
+openssl x509 -in ${v.SERVER_CERT} -text -noout
+
+# contoh keluaran atau hasil yang tampil pada layar terminal dari perintah di atas
+Certificate:
+    Data:
+        Version: 1 (0x0)
+        Serial Number:
+            21:4a:1c:77:4f:f5:f1:2d:cf:06:09:14:39:ee:99:21:8c:cc:d7:f6
+        Signature Algorithm: sha256WithRSAEncryption
+        Issuer: C = ID, ST = Jawa Tengah, L = Cilacap, O = LKS LAB, OU = ITNSA, CN = lkslab.com
+        Validity
+            Not Before: Dec 25 04:20:10 2024 GMT
+            Not After : Dec 25 04:20:10 2025 GMT
+        Subject: C = ID, ST = Jawa Tengah, L = Kebumen, O = LKS LAB, OU = ITNSA, CN = srv1.lkslab.com
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (2048 bit)
+                Modulus:
+                    00:ac:af:47:41:90:fa:9a:c3:5b:68:15:5f:32:61:
+                    61:5d:7f:dd:f4:08:2f:eb:33:68:d3:50:0a:2c:99:
+                    ... 
+                Exponent: 65537 (0x10001)
+    Signature Algorithm: sha256WithRSAEncryption
+    Signature Value:
+        73:17:b2:9e:d0:58:f1:ca:0b:0b:6a:98:68:47:1d:da:d3:df:
+        e0:d0:8c:f5:7b:bb:26:c2:81:77:70:d2:67:8c:55:fa:a1:82:
+        ...
+`}
+</CodeBlock>
+
+Setelah sertifikat server berhasil dibuat, selanjutnya sertifikat ini dapat digunakan untuk mengamankan koneksi antara server dan client.
+
+### Menambahkan SAN (Subject Alternative Name)
+
+:::info
+SAN (Subject Alternative Name) digunakan untuk menambahkan nama alternatif pada sertifikat server. SAN dapat digunakan untuk menambahkan nama domain, IP address, dan lain-lain pada sertifikat server. Ini berguna jika sertifikat digunakan pada layanan server seperti Web server atau Mail server yang memiliki beberapa domain atau subdomain yang berbeda. Dengan menambahkan SAN, client dapat memverifikasi sertifikat server sesuai atau tidak dengan domain yang diakses.
+:::
+
+Untuk menambahkan SAN pada sertifikat server, dapat mengikuti langkah-langkah berikut.
+
+#### Membuat berkas konfigurasi
+
+Buat berkas konfigurasi dengan nama <code>{v.SERVER_SAN_EXT}</code> pada direktori server dan isi dengan konfigurasi berikut.
+
+<CodeBlock language="yml" title={`${v.SERVER_CERT_DIR}/${v.SERVER_SAN_EXT}`} showLineNumbers>
+{`subjectAltName = @san
+
+[ san ]
+DNS.1 = srv1.lkslab.com
+DNS.2 = srv1.web.lkslab.com
+
+# jika ingin menambahkan IP address
+IP.1 = 192.168.1.34
+`}
+</CodeBlock>
+
+#### Menandatangani sertifikat server dengan SAN
+
+Setelah membuat berkas konfigurasi SAN, langkah selanjutnya adalah menandatangani sertifikat server dengan SAN. Jalankan perintah berikut untuk menandatangani sertifikat server dengan SAN. Sama seperti perintah untuk menandatangani sebelumnya, hanya saja ditambahkan opsi `-extfile` yang digunakan untuk menentukan berkas konfigurasi SAN.
+
+<CodeBlock language="bash" title="CLI">
+{`# highlight-next-line
+openssl x509 -req -days 365 -sha256 -CAcreateserial -in ${v.SERVER_CSR} -CA ${v.CA_CERT} -CAkey ${v.CA_PRIV_KEY} -out ${v.SERVER_CERT}
+# highlight-next-line
+-extfile ${v.SERVER_SAN_EXT}
+
+# ketika menjalankan perintah di atas, akan muncul pertanyaan untuk mengisi passphrase atau password dari private key CA
+`}
+</CodeBlock>
+
+Setelah menjalankan perintah di atas, akan menghasilkan berkas sertifikat server dengan SAN yang telah ditandatangani oleh root CA.
+
+### Menampilkan informasi sertifikat server dengan SAN
+
+Sama seperti sebelumnya, untuk menampilkan informasi sertifikat server dengan SAN yang telah dibuat, dapat menjalankan perintah berikut.
+
+<CodeBlock language="bash" title="CLI">
+{`# highlight-next-line
+openssl x509 -in ${v.SERVER_CERT} -text -noout
+
+# contoh keluaran atau hasil yang tampil pada layar terminal dari perintah di atas
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number:
+            21:4a:1c:77:4f:f5:f1:2d:cf:06:09:14:39:ee:99:21:8c:cc:d7:f9
+        Signature Algorithm: sha256WithRSAEncryption
+        Issuer: C = ID, ST = Jawa Tengah, L = Cilacap, O = LKS LAB, OU = ITNSA, CN = lkslab.com
+        Validity
+            Not Before: Dec 25 07:29:20 2024 GMT
+            Not After : Dec 25 07:29:20 2025 GMT
+        Subject: C = ID, ST = Jawa Tengah, L = Kebumen, O = LKS LAB, OU = ITNSA, CN = srv1.lkslab.com
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (2048 bit)
+                Modulus:
+                    00:ac:af:47:41:90:fa:9a:c3:5b:68:15:5f:32:61:
+                    61:5d:7f:dd:f4:08:2f:eb:33:68:d3:50:0a:2c:99:
+                    ...
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Subject Alternative Name:
+                # highlight-next-line
+                DNS:srv1.lkslab.com, DNS:srv1.web.lkslab.com
+            X509v3 Subject Key Identifier:
+                10:0F:EF:05:4D:B5:CC:39:B7:AF:F2:E9:9B:39:B5:AE:B9:26:9F:63
+            X509v3 Authority Key Identifier:
+                43:0B:19:04:42:52:30:14:05:90:CC:0C:E8:6B:4C:60:14:62:FE:1F
+    Signature Algorithm: sha256WithRSAEncryption
+    Signature Value:
+        28:14:6d:4b:9b:80:ed:25:a9:74:48:96:fd:a9:14:e4:01:6f:
+        01:dc:88:eb:67:f0:34:c9:a8:5c:f7:2b:54:d3:26:47:b8:77:
+        ...
+`}
+</CodeBlock>
+
+Dari hasil di atas, dapat dilihat bahwa sertifikat server telah memiliki SAN yang terdiri dari dua nama domain yaitu `srv1.lkslab.com` dan `srv1.web.lkslab.com`.
+
+
+Sekian tutorial instalasi dan konfigurasi dasar Certificate Authority pada Linux Debian, materi atau tutorial selanjutnya adalah membuat **Intermediate CA**.
