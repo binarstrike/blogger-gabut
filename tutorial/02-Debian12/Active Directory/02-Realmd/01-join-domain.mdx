@@ -1,0 +1,202 @@
+---
+slug: /realmd-join-domain
+title: Instalasi dan konfigurasi dasar
+description: Tutorial instalasi dan join domain dengan realmd pada Linux Debian 12
+tags: [realmd, domain, sssd, debian, linux]
+---
+
+import CodeBlock from '@theme/CodeBlock'
+import Mermaid from '@theme/Mermaid'
+import v from "./variables"
+
+# Instalasi dan konfigurasi dasar
+
+:::info
+realmd adalah sebuah layanan yang digunakan untuk mempermudah proses penggabungan domain dari mesin komputer dengan sistem operasi Linux ke layanan _Active Directory_ (AD) pada Windows Server.
+:::
+
+## Topologi
+
+Berikut topologi yang akan digunakan pada tutorial ini.
+
+<Mermaid value={`---
+title: Topologi
+---
+%%{init:{'flowchart':{'rankSpacing': 100},'themeVariables': {'fontSize':'24px'}}}%%
+flowchart LR 
+  dc1("<br>${v.DC_1_HOSTNAME}<br><br>${v.DC_1_HOST+"<br>".repeat(4)+v.DC_1_OS}") <===>
+  r1(("Router")):::nethw1 <===>
+  c1("<br>${v.SERVER_1_HOSTNAME}<br><br>${v.SERVER_1_HOST+"<br>".repeat(4)+v.SERVER_1_OS}")
+
+  dc1:::comp1    
+  c1:::comp1
+
+  classDef comp1 padding: 120px
+  classDef nethw1 padding: 100px
+`}></Mermaid>
+
+
+## Instalasi dan konfigurasi dasar
+
+Domain <code>{v.DC_1_ROOT_DOMAIN}</code> adalah nama domain untuk _domain controller_ pada server `dc01`.
+
+### Instalasi paket aplikasi
+
+Ada beberapa paket aplikasi yang perlu dipasang diantaranya yaitu `realmd`, `sssd-tools`, `libnss-sss`, `libpam-sss`, `adcli`, `oddjob-mkhomedir`, `packagekit`. Jalankan perintah berikut untuk memasang paket-paket tersebut:
+
+<CodeBlock language="bash" title="CLI">
+{`apt install realmd sssd-tools libnss-sss libpam-sss adcli samba-common oddjob-mkhomedir packagekit -y`}
+</CodeBlock>
+
+### Konfigurasi
+
+#### Mencari domain
+
+Untuk mencari domain yang tersedia, dapat menjalankan perintah berikut.
+
+:::note
+Pastikan nama domain dari _Active Directory_ (AD) pada mesin <code>{v.DC_1_HOSTNAME}</code> (<code>{v.DC_1_ROOT_DOMAIN}</code>) dapat di _lookup_ dari server <code>{v.SERVER_1_HOSTNAME}</code>.
+Hal ini dapat dicapai dengan beberapa cara, yaitu dengan menambahkan nameserver dengan alamat IP dari komputer server <code>{v.DC_1_HOSTNAME}</code> pada berkas <code>/etc/resolv.conf</code> atau dengan menambahkan nama domain dan alamat IP pada pada berkas <code>/etc/hosts</code>.
+
+<CodeBlock language='text' title='/etc/hosts' showLineNumbers>
+{`127.0.0.1    localhost
+${v.SERVER_1_HOST}  lnx-srv-1
+# highlight-next-line
+${v.DC_1_HOST}  ${v.DC_1_ROOT_DOMAIN}
+
+
+# The following lines are desirable for IPv6 capable hosts
+::1     localhost ip6-localhost ip6-loopback
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+`}
+</CodeBlock>
+
+Atau dapat dengan memodfikasi berkas `/etc/resolv.conf` dengan menambahkan nameserver dengan alamat IP dari komputer server <code>{v.DC_1_HOSTNAME}</code>.
+
+<CodeBlock language='text' title='/etc/resolv.conf' showLineNumbers>
+{`# highlight-next-line
+nameserver ${v.DC_1_HOST}
+nameserver 173.23.0.1
+`}
+</CodeBlock>
+:::
+
+<CodeBlock language="bash" title="CLI">
+{`# contoh perintah
+# realm discover <nama domain>
+
+# highlight-next-line
+realm discover ${v.DC_1_ROOT_DOMAIN}
+
+# berikut contoh hasil yang ditamplikan pada layar terminal
+lkslab.com
+    type: kerberos
+    realm-name: LKSLAB.COM
+    domain-name: lkslab.com
+    configured: kerberos-member
+    server-software: active-directory
+    client-software: sssd
+    required-package: sssd-tools
+    required-package: sssd
+    required-package: libnss-sss
+    required-package: libpam-sss
+    required-package: adcli
+    required-package: samba-common-bin
+    login-formats: %U@lkslab.com
+    login-policy: allow-realm-logins
+`}
+</CodeBlock>
+
+#### Join domain
+
+Jalankan perintah berikut untuk join domain.
+
+<CodeBlock language="bash" title="CLI">
+{`# contoh perintah
+# realm join --user=<username> <nama domain>
+
+# highlight-next-line
+realm join --user=Administrator ${v.DC_1_ROOT_DOMAIN}
+
+# setelah menjalankan perintah di atas, akan muncul prompt untuk memasukkan password
+Password for Administrator:
+`}
+</CodeBlock>
+
+:::note
+Default user untuk perintah `realm join` adalah `Administrator`, jadi opsi `--user` dapat dihilangkan jika tidak ingin menggunakan pengguna lain.
+:::
+
+#### Mengatasi error
+
+Bila terdapat kesalahan pada saat join domain, yaitu sebagai berikut.
+
+<CodeBlock language="text" title="CLI">
+{`// ini-error-mulai
+See: journalctl REALMD_OPERATION=r741165.94531
+realm: Couldn't join realm: Insufficient permissions to join the domain
+// ini-error-selesai
+`}
+</CodeBlock>
+
+Dapat diatasi dengan memodifikasi atau menambahkan berkas `/etc/krb5.conf` dan menambahkan baris kode berikut.
+
+<CodeBlock language="bash" title="/etc/krb5.conf" showLineNumbers>
+{`[libdefaults]
+rdns = false
+`}
+</CodeBlock>
+
+Setelah itu dapat menjalankan perintah untuk join domain [lagi](#join-domain).
+
+#### Verifikasi
+
+Untuk memverifikasi apakah server sudah tergabung dengan domain, dapat menjalankan perintah berikut.
+
+<CodeBlock language="bash" title="CLI">
+{`# highlight-next-line
+realm list
+
+# berikut contoh hasil yang ditamplikan pada layar terminal
+lkslab.com
+    type: kerberos
+    realm-name: LKSLAB.COM
+    domain-name: lkslab.com
+    configured: kerberos-member
+    server-software: active-directory
+    client-software: sssd
+    required-package: sssd-tools
+    required-package: sssd
+    required-package: libnss-sss
+    required-package: libpam-sss
+    required-package: adcli
+    required-package: samba-common-bin
+    login-formats: %U@lkslab.com
+    login-policy: allow-realm-logins
+`}
+</CodeBlock>
+
+### Login dengan user domain
+
+Langkah selanjutnya adalah mencoba untuk login dengan menggunakan pengguna yang dibuat pada _domain controller_. Untuk nama pengguna dapat menggunakan format `username@domain`, contoh <code>{`ucup@${v.DC_1_ROOT_DOMAIN}`}</code>
+
+<CodeBlock language='text' title='CLI'>
+{`Debian GNU/Linux 12 ${v.SERVER_1_HOSTNAME} tty1
+
+// highlight-next-line
+lnx-srv-1 login: ucup@${v.DC_1_ROOT_DOMAIN}
+Password:
+Linux ${v.SERVER_1_HOSTNAME} 6.1.0-27-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.115-1 (2024-11-01) x86_64
+
+
+Last login: Fri Dec 27 16:50:21 WIB 2024 on tty1
+// highlight-next-line
+ucup@${v.DC_1_ROOT_DOMAIN}@${v.SERVER_1_HOSTNAME} :~ $
+`}
+</CodeBlock>
+
+Sekian tutorial kali ini, materi tutorial selanjutnya adalah tentang konfigurasi lebih lanjut terkait dengan realmd.
+
+Referensi:
+- [server-world.info](https://www.server-world.info/en/note?os=Debian_12&p=realmd)
