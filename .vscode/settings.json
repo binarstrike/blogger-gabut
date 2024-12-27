@@ -5,6 +5,7 @@
     "editor.fontLigatures": true,
     "editor.formatOnSave": true,
     "editor.formatOnSaveMode": "file",
+    "editor.wordWrap": "on",
     "[javascript]": {
         "editor.maxTokenizationLineLength": 2500,
         "editor.defaultFormatter": "esbenp.prettier-vscode",
@@ -27,6 +28,7 @@
     "[mdx]": {
         "editor.tabSize": 2,
         "editor.insertSpaces": true,
+        "prettier.singleQuote": false,
     },
     "typescript.tsdk": "node_modules\\typescript\\lib"
 }
