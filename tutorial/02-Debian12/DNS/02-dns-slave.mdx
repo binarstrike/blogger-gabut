@@ -68,7 +68,7 @@ Opsi `also-notify` digunakan untuk memberi pemberitahuan pada server <code>{v.SE
 
 Setelah itu tambahankan _record_ `A` dan `NS` baru untuk server <code>{v.SERVER_2_NAME}</code> dengan memodifikasi berkas <code>{v.BIND_F_ZONE_FILE_PATH}</code> dan <code>{v.BIND_R_ZONE_FILE_PATH}</code> pada server <code>{v.SERVER_1_NAME}</code>.
 
-<CodeBlock language="text" title={v.BIND_F_ZONE_FILE_PATH}>
+<CodeBlock language="dns-zone" title={v.BIND_F_ZONE_FILE_PATH} showLineNumbers>
 {`$TTL  604800
 @ IN  SOA ${v.FQDN}. root.${v.FQDN}. (
             11  ; Serial
@@ -95,7 +95,7 @@ mail  IN  A  ${v.SERVER_1_HOST}
 `}
 </CodeBlock>
 
-<CodeBlock language="text" title={v.BIND_R_ZONE_FILE_PATH}>
+<CodeBlock language="dns-zone" title={v.BIND_R_ZONE_FILE_PATH} showLineNumbers>
 {`$TTL  604800
 @ IN  SOA ${v.FQDN}. root.${v.FQDN}. (
             10  ; Serial
@@ -130,7 +130,7 @@ sudo systemctl restart named`}
 
 Setelah mengkonfigurasi DNS pada server <code>{v.SERVER_1_NAME}</code>, langkah selanjutnya adalah menambahkan zona baru untuk domain <code>{v.FQDN}</code> dengan tipe `slave` pada server <code>{v.SERVER_2_NAME}</code> dengan memodifikasi berkas <code>{v.BIND_NAMED_CONF_PATH}</code> dan isi dengan baris kode berikut.
 
-<CodeBlock language="js" title={v.BIND_NAMED_CONF_PATH} showLineNumbers>
+<CodeBlock language="text" title={v.BIND_NAMED_CONF_PATH} showLineNumbers>
 {`zone "${v.FQDN}" {
     file "${v.BIND_F_ZONE_FILE_PATH}";
     type slave;

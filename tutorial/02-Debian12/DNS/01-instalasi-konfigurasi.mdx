@@ -74,7 +74,7 @@ Ada beberapa macam jenis record pada DNS yaitu:
 - `MX` atau _Mail Exchanger_, record jenis ini digunakan untuk mengatur dan menentukan tingkat prioritas rute mana email akan dikirim ke sebuah nama domain tempat dimana Mail server dituju.
 :::
 
-<CodeBlock language="text" title={v.BIND_F_ZONE_FILE_PATH} showLineNumbers>
+<CodeBlock language="dns-zone" title={v.BIND_F_ZONE_FILE_PATH} showLineNumbers>
 {`$TTL  604800
 @ IN  SOA ${v.FQDN}. root.${v.FQDN}. (
             11  ; Serial
@@ -123,7 +123,7 @@ Untuk contoh kode konfigurasi pada tutorial ini, komputer <code>{v.SERVER_1_NAME
 dengan CIDR `18` dan _netmask_ `255.255.192.0`, maka `65.10` adalah angka dari _octet_ terakhir IP _host_.
 :::
 
-<CodeBlock language="text" title={v.BIND_R_ZONE_FILE_PATH} showLineNumbers>
+<CodeBlock language="dns-zone" title={v.BIND_R_ZONE_FILE_PATH} showLineNumbers>
 {`$TTL  604800
 @ IN  SOA ${v.FQDN}. root.${v.FQDN}. (
             10  ; Serial
