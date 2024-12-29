@@ -133,7 +133,7 @@ const config: Config = {
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
-      additionalLanguages: ["bash", "yaml"],
+      additionalLanguages: ["bash", "yaml", "nginx", "apacheconf", "dns-zone-file"],
       magicComments: [
         {
           className: "code-block-highlighted-line",
