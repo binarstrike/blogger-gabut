@@ -63,7 +63,7 @@ Isi berkas konfigurasi <code>{v.NGINX_VIRT_HOST_FILE_1}</code> dengan baris kode
 baris kode yang dimulai dengan karakter `#` dianggap sebagai komen dan tidak termasuk dalam konfigurasi nginx.
 :::
 
-<CodeBlock language="bash" title={v.NGINX_VIRT_HOST_FILE_1} showLineNumbers>
+<CodeBlock language="nginx" title={v.NGINX_VIRT_HOST_FILE_1} showLineNumbers>
 {`server {
     # menentukan nomor port. 80 untuk protocol http, 443 untuk protocol https
     listen 80;
@@ -80,13 +80,15 @@ baris kode yang dimulai dengan karakter `#` dianggap sebagai komen dan tidak ter
 `}
 </CodeBlock>
 
-Selanjutnya tambahkan berkas html pada direktori root dari konfigurasi nginx yaitu pada <code>{v.NGINX_WEB_ROOT_DIR}</code> dengan nama berkas `index.html` sesuai dengan _index_ pada konfigurasi nginx. Buka berkas <code>{v.NGINX_HTML_FILE_PATH_1}</code> dengan teks editor seperti `nano` atau `vim`.
+### Menambahkan berkas halaman web
+
+Selanjutnya tambahkan berkas html pada direktori root dari konfigurasi nginx yaitu pada <code>{v.NGINX_WEB_ROOT_DIR}</code> dengan nama berkas `index.html` sesuai dengan _index_ pada konfigurasi nginx. Kemudian buka berkas <code>{v.NGINX_HTML_FILE_PATH_1}</code> tersebut dengan teks editor seperti `nano` atau `vim`.
 
 <CodeBlock language="bash" title="CLI">
 {`sudo nano ${v.NGINX_HTML_FILE_PATH_1}`}
 </CodeBlock>
 
-Selanjutnya isi dengan dengan teks dengan syntax html yang akan ditampilkan pada halaman web, contohnya sebagai berikut.
+Selanjutnya modfikasi dan isi berkas html tersebut. Contohnya sebagai berikut.
 
 <CodeBlock language="html" title={v.NGINX_HTML_FILE_PATH_1} showLineNumbers>
 {`<html>
@@ -101,7 +103,9 @@ Selanjutnya isi dengan dengan teks dengan syntax html yang akan ditampilkan pada
 `}
 </CodeBlock>
 
-Langkah selanjutnya adalah memulai ulang layanan nginx pada server <code>{v.SERVER_1_NAME}</code> dengan menjalankan perintah berikut.
+### Memulai ulang layanan nginx
+
+Langkah selanjutnya adalah memulai ulang layanan nginx pada server <code>{v.SERVER_1_HOSTNAME}</code> dengan menjalankan perintah berikut.
 
 <CodeBlock language="bash" title="CLI">
 {`sudo systemctl restart nginx`}
@@ -109,9 +113,7 @@ Langkah selanjutnya adalah memulai ulang layanan nginx pada server <code>{v.SERV
 
 ## Pengujian
 
-### Membuka halaman web pada klien browser
-
-Buka Web browser seperti `Google Chrome`, `Microsoft Edge`, `Firefox` atau sejenisnya pada komputer <code>{v.CLIENT_NAME}</code> dan masukan alamat IP atau nama domain dari komputer server <code>{v.SERVER_1_NAME}</code>. Berikut contoh tampilan halaman web pada Web browser dari komputer klien.
+Buka aplikasi _browser_ seperti `Google Chrome`, `Microsoft Edge`, `Firefox` atau sejenisnya pada komputer <code>{v.CLIENT_1_HOSTNAME}</code> dan masukan alamat IP atau nama domain dari komputer server <code>{v.SERVER_1_HOSTNAME}</code>. Berikut contoh tampilan halaman web pada Web browser dari komputer klien.
 
 ![client web broser test](./img/ss-client-web-browser-test.png)
 
