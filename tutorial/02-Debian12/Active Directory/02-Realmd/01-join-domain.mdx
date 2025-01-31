@@ -1,3 +1,5 @@
+
+
 ---
 slug: /realmd-join-domain
 title: Instalasi dan konfigurasi dasar
@@ -94,7 +96,7 @@ lkslab.com
     type: kerberos
     realm-name: LKSLAB.COM
     domain-name: lkslab.com
-    configured: kerberos-member
+    configured: no
     server-software: active-directory
     client-software: sssd
     required-package: sssd-tools
@@ -103,8 +105,6 @@ lkslab.com
     required-package: libpam-sss
     required-package: adcli
     required-package: samba-common-bin
-    login-formats: %U@lkslab.com
-    login-policy: allow-realm-logins
 `}
 </CodeBlock>
 
